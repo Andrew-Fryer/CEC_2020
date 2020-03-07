@@ -8,4 +8,6 @@ print(env.stateEquals(env.dState))
 print(env.stateEquals(env.state))
 print(env.done())
 
+print(env.getSize())
+
 print("done")

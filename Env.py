@@ -10,12 +10,12 @@ class Env:
             # I'm assuming the file could be sparse
 
             lines = [l for l in f.read().splitlines() if l != ""]
+            index = lines.index("scrambled_image")
+
+
             assert lines[0] == "unscrambled_image"
             assert lines[1][0:5] == "size="
             size = int(lines[1][5:])
-
-            index = lines.index("scrambled_image")
-
             desiredState = [[[0 for _ in range(size)] for _ in range(size)] for _ in range(size)]
             for l in lines[2:index]:
                 # add to state
@@ -30,8 +30,12 @@ class Env:
 
                 desiredState[x][y][z] = color
 
+            assert lines[index] == "scrambled_image"
+            assert lines[index+1][0:5] == "size="
+            dSize = int(lines[index+1][5:])
+            assert dSize == size
             state = [[[0 for _ in range(size)] for _ in range(size)] for _ in range(size)]
-            for l in lines[2:index]:
+            for l in lines[index+2:]:
                 # add to state
                 eIndex = l.index("=")
                 pos = l[:eIndex]
@@ -49,22 +53,10 @@ class Env:
             self.s = size
 
     def stateEquals(self, mem):
-        # wip
-        for x in range(self.s):
-            for y in range(self.s):
-                for z in range(self.s):
-                    if self.dState[x][y][z] != mem[x][y][z]:
-                        return False
-        return True
+        return self.state == mem
 
     def done(self):
-        # wip
-        for x in range(self.s):
-            for y in range(self.s):
-                for z in range(self.s):
-                    if self.state[x][y][z] != self.dState[x][y][z]:
-                        return False
-        return True
+        return self.state == self.dState
 
     def blockAt(self, x, y):
         for z in reversed(range(self.s)):
