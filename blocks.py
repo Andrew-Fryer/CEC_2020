@@ -51,6 +51,28 @@ class Algorithm:
                 di = 1
                 dj = 0
                 it += 1
+                                
+    def empty_hopper(self):
+        colours = self.drone.getHopperColours()
+        for c in colours:
+            colourDropped = False
+            for s in self.stacks:
+                if (self.grid.blockAt(s.x, s.y) == c):
+                    self.drone.moveTo([s.x, s.y])
+                    self.drone.scan()
+                    self.drone.dropOff(c, -1)
+                    self.drone.scan()
+                    colourDropped = True
+                    break
+            if (colourDropped == False and len(self.emptySpaces) > 0):
+                newStack = self.emptySpaces[0]
+                self.emptySpaces.remove(newStack)
+                self.stacks.append(newStack)
+                self.colourStacks.append(c)
+                self.drone.moveTo([newStack.x, newStack.y])
+                self.drone.scan()
+                self.drone.dropOff(c, -1)
+                self.drone.scan()
 
     def build_stacks(self):
         self.first_sweep()
@@ -72,26 +94,24 @@ class Algorithm:
                     self.drone.scan()
                     
                     #if hopper is full, empty it
-                    if (self.drone.isHopperFull()): #drop off blocks
-                        colours = self.drone.getHopperColours()
-                        for c in colours:
-                            colourDropped = False
-                            for s in self.stacks:
-                                if (self.grid.blockAt(s.x, s.y) == c):
-                                    self.drone.moveTo([s.x, s.y])
-                                    self.drone.scan()
-                                    self.drone.dropOff(c, -1)
-                                    self.drone.scan()
-                                    colourDropped = True
-                                    break
-                            if (colourDropped == False and len(self.emptySpaces) > 0):
-                                newStack = self.emptySpaces[0]
-                                self.emptySpaces.remove(newStack)
-                                self.stacks.append(newStack)
-                                self.colourStacks.append(c)
-                                self.drone.moveTo([newStack.x, newStack.y])
-                                self.drone.scan()
-                                self.drone.dropOff(c, -1)
-                                self.drone.scan()
+                    if (self.drone.isHopperFull()): #drop off blocks, NEED TO ACCOUNT FOR IF STACK IS FULL
+                        empty_hopper()
+    
+    def build_final(self):
+        for z in range(self.grid.getSize()):
+            level_blocks = self.grid.getDesiredLevel(z)
+            for b in level_blocks:
+                if (b[2] in self.hopper):
+                    self.drone.moveTo([b[0], b[1]])
+                    self.drone.dropOff(b[2], z)
+                else:
+                    for s in self.stacks:
+                        if (self.grid.blockAt(s.x, s.y) == b[2]):
+                            self.drone.moveTo([s.x, s.y])
+                            self.drone.pickUp()
+                            self.drone.moveTo(b[0], b[1])
+                            self.drone.dropOff(b[2], z)
+                            break
+                            
                     
         

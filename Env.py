@@ -79,6 +79,15 @@ class Env:
 
     def getSize(self):
         return self.s
+    
+    def getDesiredLevel(self, z):
+        out = []
+        for i in range(self.s):
+            for j in range(self.s):
+                temp = self.dState[i][j][z]
+                if (temp != ""):
+                    out.append((i, j, temp))
+        return out
 
     def addBlock(self, x, y, tuple):
         color = tuple[0]
