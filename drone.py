@@ -66,7 +66,7 @@ class Drone:
     def pickUp(self):
         toAdd = self.grid.takeBlock(self.pos[0], self.pos[1]) #(colour, z)
         if (toAdd == None): #if there is an error exit
-            return
+            return True
         if (len(self.hopper) < self.hopperSize): #if there is room in the hopper, pick up block
             self.hopper.append(toAdd[0]) #add to hopper
             
@@ -79,6 +79,9 @@ class Drone:
             
             self.lastColour = newColour
             self.memory[self.pos[0]][self.pos[1]][toAdd[1]] = None
+            return False
+        else:
+            return True
     
     #Drops off a block in the environment at the current position at a given z value
     def dropOff(self, colour, z):
@@ -90,14 +93,14 @@ class Drone:
                 inHopper = True
                 break
         if (inHopper == False): #If the block is not in the hopper
-            return
+            return True
         self.hopper.remove(toRemove) #Remove block from hopper
         
         newZ = z
         if (z == -1):
             newZ = self.grid.blockAt(self.pos[0], self.pos[1])[1] + 1
         if (newZ >= self.grid.getSize()):
-            return
+            return True
         #Add block to grid and memory
         test = self.grid.addBlock(self.pos[0], self.pos[1], (toRemove, newZ))
         if (test != None):
@@ -109,6 +112,9 @@ class Drone:
                 
             self.lastColour = colour
             self.memory[self.pos[0]][self.pos[1]][newZ] = toRemove[0]
+            return False
+        else:
+            return True
             
     #Scans the block below the drone
     def scan(self):

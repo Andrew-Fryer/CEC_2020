@@ -1,6 +1,4 @@
-import numpy as np
 from drone import Drone
-
 
 class Algorithm:
     def __init__(self, grid):
@@ -42,7 +40,12 @@ class Algorithm:
                 if (i.z == n):  #check only those unknown spaces for specific z values
                     #move drone, pickup block, and scan
                     self.drone.moveTo([i.x, i.y]) 
-                    self.drone.pickUp()
+                    notPickedUp = self.drone.pickUp()
+                    if (notPickedUp == False):
+                        if (self.grid.blockAt(i.x, i.y) == None):
+                            self.emptySpaces.append(i)
+                            self.stacks.append(i)
+                            self.unknown.remove(i)
                     self.drone.scan()
                     
                     #if hopper is full, empty it
