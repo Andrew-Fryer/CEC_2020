@@ -13,6 +13,8 @@ True
 True
 warning, you are placing a floating block
 True
+can't add block becasue (x, y) is out of bounds
+None
 
 red
 red
