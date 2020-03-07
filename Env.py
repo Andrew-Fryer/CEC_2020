@@ -1,5 +1,3 @@
-from asyncore import file_dispatcher
-
 import pandas as pd
 
 import plotly.offline as py #visualization
@@ -69,7 +67,7 @@ class Env:
         for z in reversed(range(self.s)):
             if self.state[x][y][z] != "":
                 return self.state[x][y][z], z
-        return None # default could be "", -1
+        return '', -1
     
     def desiredBlockAt(self, x, y):
         for z in reversed(range(self.s)):
@@ -143,9 +141,9 @@ class Env:
         rightN = False if x == self.s - 1 else self.state[x + 1][y][z] != ""
         upN = False if y == self.s - 1 else self.state[x][y + 1][z] != ""
         downN = False if y == 0 else self.state[x][y - 1][z] != ""
-        if leftN and rightN and upN and downN:
-            print("can't take block, all of its neighbors are full")
-            return None
+#        if leftN and rightN and upN and downN:
+#            print("can't take block, all of its neighbors are full")
+#            return None
 
         self.state[x][y][z] = ""
         return color#, z

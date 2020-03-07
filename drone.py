@@ -52,18 +52,18 @@ class Drone:
         self.scan()
         return True
     def moveTo(self, target):
-        while (self.pos[0] != target[0] and self.pos[1] != target[1]):
-            xDiff = target[0] - self.pos[0]
-            if (xDiff > 0):
-                self.move(1)
-            elif (xDiff < 0):
+        xDiff = target[0] - self.pos[0]
+        yDiff = target[1] - self.pos[1]
+        for i in range(abs(xDiff)):
+            if (xDiff < 0):
                 self.move(3)
             else:
-                yDiff = target[1] - self.pos[1]
-                if (yDiff > 0):
-                    self.move(0)
-                elif (yDiff < 0):
-                    self.move(2)
+                self.move(1)
+        for i in range(abs(yDiff)):
+            if (yDiff < 0):
+                self.move(2)
+            else:
+                self.move(0)
 
     #Picks up a block in the environment at the current position, updates time
     def pickUp(self):
@@ -72,17 +72,18 @@ class Drone:
             if (toAdd == None):  # if there is an error exit
                 return None
 
-            self.hopper.append(toAdd[0]) #add to hopper
+            self.hopper.append(toAdd) #add to hopper
 
             #Update time
-            newColour = toAdd[0]
+            newColour = toAdd
             if (newColour == self.lastColour):
                 self.time += 2
             else:
                 self.time += 3
 
             self.lastColour = newColour
-            self.memory[self.pos[0]][self.pos[1]][toAdd[1]] = None
+            temp = self.scan()
+            self.memory[self.pos[0]][self.pos[1]][temp[1]] = None
             self.scan()
             return True
 
@@ -101,14 +102,14 @@ class Drone:
 
         newZ = z
         if (z == -1):
-            newZ = self.grid.blockAt(self.pos[0], self.pos[1])[1] + 1
-        if (newZ >= self.grid.getSize()):
+            newZ = self.env.blockAt(self.pos[0], self.pos[1])[1] + 1
+        if (newZ >= self.env.getSize()):
             return True
         #Add block to grid and memory
-        test = self.grid.addBlock(self.pos[0], self.pos[1], (toRemove, newZ))
+        test = self.env.addBlock(self.pos[0], self.pos[1], (toRemove, newZ))
         newZ = self.env.blockAt(self.pos[0], self.pos[1])[1] + 1
         if (newZ >= self.env.getSize()):
-            raise ValueError("we just pulled a block out of the hopper and it doesn't fit in the grid")
+            return 10
 
         #Add block to env and memory
         test = self.env.addBlock(self.pos[0], self.pos[1], (toRemove, newZ))
@@ -127,6 +128,7 @@ class Drone:
         self.memory[self.pos[0]][self.pos[1]][newZ] = toRemove[0]
         self.scan()
         return True
+    
     #Scans the block below the drone
     def scan(self):
         block = self.env.blockAt(self.pos[0], self.pos[1])
