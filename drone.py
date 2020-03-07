@@ -73,10 +73,11 @@ class Drone:
     
     #Picks up a block in the environment at the current position, updates time
     def pickUp(self):
-        toAdd = self.env.takeBlock(self.pos[0], self.pos[1]) #(colour, z)
-        if (toAdd == None): #if there is an error exit
-            return
         if (len(self.hopper) < self.hopperSize): #if there is room in the hopper, pick up block
+            toAdd = self.env.takeBlock(self.pos[0], self.pos[1])  # (colour, z)
+            if (toAdd == None):  # if there is an error exit
+                return None
+
             self.hopper.append(toAdd[0]) #add to hopper
             
             #Update time
@@ -88,6 +89,8 @@ class Drone:
             
             self.lastColour = newColour
             self.memory[self.pos[0]][self.pos[1]][toAdd[1]] = None
+            return True
+            # We should always look beneath us now...
     
     #Drops off a block in the environment at the current position at a given z value
     def dropOff(self, colour, z):
@@ -99,25 +102,30 @@ class Drone:
                 inHopper = True
                 break
         if (inHopper == False): #If the block is not in the hopper
-            return
+            return None
         self.hopper.remove(toRemove) #Remove block from hopper
         
         newZ = z
         if (z == -1):
             newZ = self.env.blockAt(self.pos[0], self.pos[1])[1] + 1
         if (newZ >= self.env.getSize()):
-            return
+            raise ValueError("we just pulled a block out of the hopper and it doesn't fit in the grid")
         #Add block to env and memory
         test = self.env.addBlock(self.pos[0], self.pos[1], (toRemove, newZ))
-        if (test != None):
-            #Update time
-            if (colour == self.lastColour):
-                self.time += 2
-            else:
-                self.time += 3
-                
-            self.lastColour = colour
-            self.memory[self.pos[0]][self.pos[1]][newZ] = toRemove[0]
+        if (test == None):
+            print("add block failed")
+            return None
+
+        #Update time
+        if (colour == self.lastColour):
+            self.time += 2
+        else:
+            self.time += 3
+
+        self.lastColour = colour
+        self.memory[self.pos[0]][self.pos[1]][newZ] = toRemove[0]
+        return True
+        # We should always look beneath us now...
             
     #Scans the block below the drone
     def scan(self):
