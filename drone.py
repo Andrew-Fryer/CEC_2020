@@ -47,6 +47,20 @@ class Drone:
             self.pos[0] += -1
         else:
             self.time += -1
+            
+    def moveTo(self, target):
+        while (self.pos[0] != target[0] and self.pos[1] != target[1]):
+            xDiff = target[0] - self.pos[0]
+            if (xDiff > 0):
+                self.move(1)
+            elif (xDiff < 0):
+                self.move(3)
+            else:
+                yDiff = target[1] - self.pos[1]
+                if (yDiff > 0):
+                    self.move(0)
+                elif (yDiff < 0):
+                    self.move(2)
     
     #Picks up a block in the environment at the current position, updates time
     def pickUp(self):
@@ -79,8 +93,13 @@ class Drone:
             return
         self.hopper.remove(toRemove) #Remove block from hopper
         
+        newZ = z
+        if (z == -1):
+            newZ = self.grid.blockAt(self.pos[0], self.pos[1])[1] + 1
+        if (newZ >= self.grid.getSize()):
+            return
         #Add block to grid and memory
-        test = self.grid.addBlock(self.pos[0], self.pos[1], toRemove)
+        test = self.grid.addBlock(self.pos[0], self.pos[1], (toRemove, newZ))
         if (test != None):
             #Update time
             if (colour == self.lastColour):
@@ -89,7 +108,7 @@ class Drone:
                 self.time += 3
                 
             self.lastColour = colour
-            self.memory[self.pos[0]][self.pos[1]][z] = toRemove[0]
+            self.memory[self.pos[0]][self.pos[1]][newZ] = toRemove[0]
             
     #Scans the block below the drone
     def scan(self):
@@ -97,7 +116,17 @@ class Drone:
         self.memory[self.pos[0]][self.pos[1]][block[1]] = block[0]
         desiredBlock = self.grid.desiredBlockAt(self.pos[0], self.pos[1])
         self.desiredMemory[self.pos[0]][self.pos[1]][desiredBlock[1]] = desiredBlock[0]
-        return block
+        return block, desiredBlock
+    
+    def isHopperFull(self):
+        return len(self.hopper) >= self.hopperSize
+    
+    def getHopperColours(self):
+        out = []
+        for i in self.hopper:
+            if (i not in out):
+                out.append(i)
+        return out
     
     
                 
