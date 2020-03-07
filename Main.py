@@ -9,8 +9,13 @@ print(env.stateEquals(env.state))
 print(env.done())
 
 
-print(env.getSize())
-env.plot_state()
 
+## Joe's Experimental Zone - Do Not Touch
+
+print(env.getSize())
+env.plot_state(env.state_dataFrame)
+
+## Joe's Experimental Zone - Do Not Touch
 
 print("done")
+ 
