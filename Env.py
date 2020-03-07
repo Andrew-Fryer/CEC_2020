@@ -81,11 +81,12 @@ class Env:
         color = tuple[0]
         z = tuple[1]
 
-        # check that x, y is in the grid area
+        # check that x, y, z is in the grid area
         xIn = x >= 0 and x < self.s
         yIn = y >= 0 and y < self.s
-        if not(xIn and yIn):
-            print("can't add block becasue (x, y) is out of bounds")
+        zIn = z >= 0 and z < self.s
+        if not(xIn and yIn and zIn):
+            print("can't add block becasue (x, y, z) is out of bounds")
             return None
 
         # check if the block will be floating
