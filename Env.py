@@ -164,7 +164,7 @@ class Env:
                       y = empty_blocks["Y"],
                       z = empty_blocks["Z"],
                       mode = "markers",
-                      opacity=0.5,
+                      opacity=0.3,
                       name = "Empty Space",
                       marker = dict(size = 10,color = "grey")
                      )        
@@ -173,7 +173,7 @@ class Env:
                       z = full_blocks["Z"],
                       mode = "markers",
                       name = "Filled Space",
-                      marker = dict(size = 10,color = "green")
+                      marker = dict(size = 10,color = full_blocks['RGB'])
                      )
         layout = go.Layout(dict(title = "State of the Structure",
                         scene = dict(camera = dict(up=dict(x= 0 , y=0, z=0),
