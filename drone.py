@@ -103,7 +103,7 @@ class Drone:
             return True
         #Add block to grid and memory
         test = self.grid.addBlock(self.pos[0], self.pos[1], (toRemove, newZ))
-            newZ = self.env.blockAt(self.pos[0], self.pos[1])[1] + 1
+        newZ = self.env.blockAt(self.pos[0], self.pos[1])[1] + 1
         if (newZ >= self.env.getSize()):
             return
         #Add block to env and memory
