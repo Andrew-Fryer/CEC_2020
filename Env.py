@@ -2,6 +2,8 @@ from asyncore import file_dispatcher
 
 import pandas as pd
 
+import plotly.offline as py #visualization
+
 # add desired grid
 
 class Env:
@@ -50,6 +52,8 @@ class Env:
 
             self.state = state
             self.dState = desiredState
+            self.state_dataFrame = self.convert_to_dataframe(state)
+            self.dState_dataFrame = self.convert_to_dataframe(desiredState)
             self.s = size
 
     def stateEquals(self, mem):
@@ -88,4 +92,19 @@ class Env:
                 self.state[x][y][z] = ""
                 return color, z
         return "", 0
+    
+    def convert_to_dataframe(self, State):
+        df = pd.DataFrame(columns=['X', 'Y', 'Z', 'RGB'])
+        for x in range(len(State)):
+            for y in range(len(State[x])):
+                for z in range(len(State[x][y])):
+                    if State[x][y][z] == '':
+                        df = df.append({'X': x, 'Y': y, 'Z': z, 'RGB': None}, ignore_index=True)
+                    else:
+                        RGB_values = State[x][y][z].split('_')
+                        df = df.append({'X': x, 'Y': y, 'Z': z, 'RGB': 'rgb({0},{1},{2})'.format(RGB_values[0],RGB_values[1],RGB_values[2])}, ignore_index=True)
+        print(df.head)
+        return df
 
+    def plot_state(self):
+        pass
