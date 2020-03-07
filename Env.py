@@ -168,6 +168,7 @@ class Env:
 
     def plot_state(self, drone):
         # separate empty and non empty squares
+        self.state_dataFrame = self.convert_to_dataframe(self.state)
         State = self.state_dataFrame
         
         empty_blocks    = State[State['RGB'] == '']
