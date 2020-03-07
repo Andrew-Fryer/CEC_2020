@@ -62,7 +62,7 @@ class Env:
         for z in reversed(range(self.s)):
             if self.state[x][y][z] != "":
                 return self.state[x][y][z], z
-        return None
+        return None # default could be "", -1
 
     def getSize(self):
         return self.s
@@ -71,6 +71,36 @@ class Env:
         # wip
         color = tuple[0]
         z = tuple[1]
+
+        # check if the block will be floating
+        bAt = self.blockAt(x,y)
+        if bAt is None:
+            existingZ = -1
+        else:
+            _, existingZ = bAt
+        if z != existingZ + 1:
+            if z <= existingZ:
+                print("Can't place block beneath another block", x, y, z, existingZ)
+                return None
+            print("warning, you are placing a floating block")
+
+            # check that the block will have at least 1 neighbor to support it
+            leftN = False if x == 0 else self.state[x-1][y][z] != ""
+            rightN = False if x == self.s - 1 else self.state[x+1][y][z] != ""
+            upN = False if y == self.s - 1 else self.state[x][y+1][z] != ""
+            downN = False if y == 0 else self.state[x][y-1][z] != ""
+
+            if (not leftN) and (not rightN) and (not upN) and (not downN):
+                print("No neightbors to support")
+                return None
+
+        # add block in
+        self.state[x][y][z] = color
+        return True # success
+
+
+
+
 
 
     def takeBlock(self, x, y):
