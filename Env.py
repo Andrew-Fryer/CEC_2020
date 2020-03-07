@@ -63,6 +63,12 @@ class Env:
             if self.state[x][y][z] != "":
                 return self.state[x][y][z], z
         return None
+    
+    def desiredBlockAt(self, x, y):
+        for z in reversed(range(self.s)):
+            if self.state[x][y][z] != "":
+                return self.dState[x][y][z], z
+        return None
 
     def getSize(self):
         return self.s

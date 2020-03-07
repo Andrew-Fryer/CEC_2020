@@ -18,15 +18,21 @@ class Drone:
         self.lastColour = ""
         
         self.memory = []
+        self.desiredMemory = []
         #Initializing drone's memory of environment to zero
         for i in range(self.grid.getSize()):
             toAddi = []
+            toAddiD = []
             for j in range(self.grid.getSize()):
                 toAddj = []
+                toAddjD = []
                 for k in range(self.grid.getSize()):
                     toAddj.append(None)
+                    toAddjD.append(None)
                 toAddi.append(toAddj)
+                toAddiD.append(toAddjD)
             self.memory.append(toAddi)
+            self.desiredMemory.append(toAddiD)
         
     #Moves the drone in a given direction, updates the time taken
     def move(self, direction): #0 is up, 1 is right, 2 is down, 3 is left
@@ -85,9 +91,12 @@ class Drone:
             self.lastColour = colour
             self.memory[self.pos[0]][self.pos[1]][z] = toRemove[0]
             
+    #Scans the block below the drone
     def scan(self):
         block = self.grid.blockAt(self.pos[0], self.pos[1])
         self.memory[self.pos[0]][self.pos[1]][block[1]] = block[0]
+        desiredBlock = self.grid.desiredBlockAt(self.pos[0], self.pos[1])
+        self.desiredMemory[self.pos[0]][self.pos[1]][desiredBlock[1]] = desiredBlock[0]
         return block
     
     
