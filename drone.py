@@ -8,8 +8,18 @@ class Drone:
         self.time = 0
         
         self.hopper = []
-        self.hopperSize = (int)(math.floor(pow(self.grid.getSize(), 0.5)/2))
+        self.hopperSize = (int)(math.floor(pow(pow(self.grid.getSize(), 3), 0.5)/2))
         self.lastColour = ""
+        
+        self.memory = []
+        for i in range(self.grid.getSize()):
+            toAddi = []
+            for j in range(self.grid.getSize()):
+                toAddj = []
+                for k in range(self.grid.getSize()):
+                    toAddj.append(None)
+                toAddi.append(toAddj)
+            self.memory.append(toAddi)
         
     def move(self, direction): #0 is up, 1 is right, 2 is down, 3 is left
         self.time += 1
@@ -35,6 +45,7 @@ class Drone:
                 self.time += 2
             else:
                 self.time += 3
+            self.lastColour = newColour
     
     def dropOff(self, colour, z):
         toRemove = None
@@ -44,6 +55,14 @@ class Drone:
                 break
         
         self.hopper.remove(toRemove)
-        self.grid.addBlock(self.pos[0], self.pos[1], toRemove)
+        test = self.grid.addBlock(self.pos[0], self.pos[1], toRemove)
+        if (test != None):
+            if (colour == self.lastColour):
+                self.time += 2
+            else:
+                self.time += 3
+            self.lastColour = colour
+    
+    
                 
             
