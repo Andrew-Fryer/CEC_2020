@@ -55,6 +55,7 @@ class Drone:
         else:
             print("invalid direction")
         self.time += 1
+        self.scan()
         return True
     def moveTo(self, target):
         while (self.pos[0] != target[0] and self.pos[1] != target[1]):
@@ -88,8 +89,9 @@ class Drone:
 
             self.lastColour = newColour
             self.memory[self.pos[0]][self.pos[1]][toAdd[1]] = None
+            self.scan()
             return True
-            # We should always look beneath us now...
+
     #Drops off a block in the environment at the current position at a given z value
     def dropOff(self, colour, z):
         toRemove = None
@@ -113,7 +115,7 @@ class Drone:
         newZ = self.env.blockAt(self.pos[0], self.pos[1])[1] + 1
         if (newZ >= self.env.getSize()):
             raise ValueError("we just pulled a block out of the hopper and it doesn't fit in the grid")
-        
+
         #Add block to env and memory
         test = self.env.addBlock(self.pos[0], self.pos[1], (toRemove, newZ))
 
@@ -129,8 +131,8 @@ class Drone:
 
         self.lastColour = colour
         self.memory[self.pos[0]][self.pos[1]][newZ] = toRemove[0]
+        self.scan()
         return True
-        # We should always look beneath us now...
     #Scans the block below the drone
     def scan(self):
         block = self.env.blockAt(self.pos[0], self.pos[1])
