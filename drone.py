@@ -72,18 +72,16 @@ class Drone:
             if (toAdd == None):  # if there is an error exit
                 return None
 
-            self.hopper.append(toAdd) #add to hopper
+            newColour = toAdd[0]
+            self.hopper.append(newColour) #add to hopper
 
             #Update time
-            newColour = toAdd
             if (newColour == self.lastColour):
                 self.time += 2
             else:
                 self.time += 3
 
             self.lastColour = newColour
-            temp = self.scan()
-            self.memory[self.pos[0]][self.pos[1]][temp[1]] = None
             self.scan()
             return True
 
@@ -98,21 +96,13 @@ class Drone:
                 break
         if (inHopper == False): #If the block is not in the hopper
             return None
-        self.hopper.remove(toRemove) #Remove block from hopper
 
         newZ = z
         if (z == -1):
             newZ = self.env.blockAt(self.pos[0], self.pos[1])[1] + 1
-        if (newZ >= self.env.getSize()):
-            return True
         #Add block to grid and memory
-        test = self.env.addBlock(self.pos[0], self.pos[1], (toRemove, newZ))
-        newZ = self.env.blockAt(self.pos[0], self.pos[1])[1] + 1
-        if (newZ >= self.env.getSize()):
-            return 10
 
-        #Add block to env and memory
-#        test = self.env.addBlock(self.pos[0], self.pos[1], (toRemove, newZ))
+        test = self.env.addBlock(self.pos[0], self.pos[1], (toRemove, newZ))
 
         if (test == None):
             print("add block failed")
@@ -127,11 +117,16 @@ class Drone:
         self.lastColour = colour
         self.memory[self.pos[0]][self.pos[1]][newZ] = toRemove
         self.scan()
+        self.hopper.remove(toRemove) #Remove block from hopper
         return True
-    
+
     #Scans the block below the drone
     def scan(self):
         block = self.env.blockAt(self.pos[0], self.pos[1])
+        if block in None:
+            block = ["", -1]
+        for z in range(self.env.getSize() - 1, block[1], -1):
+            self.memory[self.pos[0]][self.pos[1]][block[z]] = None
         if block is not None:
             self.memory[self.pos[0]][self.pos[1]][block[1]] = block[0]
         return block
