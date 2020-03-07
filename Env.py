@@ -160,7 +160,12 @@ class Env:
                         df = df.append({'X': x, 'Y': y, 'Z': z, 'RGB': ''}, ignore_index=True)
                     else:
                         RGB_values = State[x][y][z].split('_')
-                        df = df.append({'X': x, 'Y': y, 'Z': z, 'RGB': 'rgb({0},{1},{2})'.format(RGB_values[0],RGB_values[1],RGB_values[2])}, ignore_index=True)
+                        df = df.append({'X': x, 
+                            'Y': y, 
+                            'Z': z, 
+                            'RGB': 'rgb({0},{1},{2})'.format(RGB_values[0],RGB_values[1],RGB_values[2])}, 
+                            ignore_index=True
+                            )
         return df
 
     def plot_state(self, drone):
