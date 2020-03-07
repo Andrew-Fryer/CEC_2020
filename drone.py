@@ -130,7 +130,8 @@ class Drone:
     #Scans the block below the drone
     def scan(self):
         block = self.env.blockAt(self.pos[0], self.pos[1])
-        self.memory[self.pos[0]][self.pos[1]][block[1]] = block[0]
+        if block is not None:
+            self.memory[self.pos[0]][self.pos[1]][block[1]] = block[0]
         return block
 
     def isHopperFull(self):
