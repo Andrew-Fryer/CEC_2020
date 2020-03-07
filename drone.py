@@ -112,7 +112,7 @@ class Drone:
             return 10
 
         #Add block to env and memory
-        test = self.env.addBlock(self.pos[0], self.pos[1], (toRemove, newZ))
+#        test = self.env.addBlock(self.pos[0], self.pos[1], (toRemove, newZ))
 
         if (test == None):
             print("add block failed")
@@ -125,7 +125,7 @@ class Drone:
             self.time += 3
 
         self.lastColour = colour
-        self.memory[self.pos[0]][self.pos[1]][newZ] = toRemove[0]
+        self.memory[self.pos[0]][self.pos[1]][newZ] = toRemove
         self.scan()
         return True
     
