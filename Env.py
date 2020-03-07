@@ -1,7 +1,7 @@
 import pandas as pd
 
 import plotly.offline as py #visualization
-
+from plotly.subplots import make_subplots
 import plotly.graph_objs as go#visualization
 
 
@@ -158,20 +158,28 @@ class Env:
                         df = df.append({'X': x, 'Y': y, 'Z': z, 'RGB': ''}, ignore_index=True)
                     else:
                         RGB_values = State[x][y][z].split('_')
-                        df = df.append({'X': x, 'Y': y, 'Z': z, 'RGB': 'rgb({0},{1},{2})'.format(RGB_values[0],RGB_values[1],RGB_values[2])}, ignore_index=True)
+                        df = df.append({'X': x, 
+                            'Y': y, 
+                            'Z': z, 
+                            'RGB': 'rgb({0},{1},{2})'.format(RGB_values[0],RGB_values[1],RGB_values[2])}, 
+                            ignore_index=True
+                            )
         return df
 
-    def plot_state(self, State):
+    def plot_state(self, drone):
         # separate empty and non empty squares
+        State = self.state_dataFrame
+        
         empty_blocks    = State[State['RGB'] == '']
         full_blocks     = State[State['RGB'] != '']
 
 
+        fig = make_subplots(rows=1, cols=2)
         trace1 = go.Scatter3d(x = empty_blocks["X"],
                       y = empty_blocks["Y"],
                       z = empty_blocks["Z"],
                       mode = "markers",
-                      opacity=0.3,
+                      opacity=0.11,
                       name = "Empty Space",
                       marker = dict(size = 10,color = "grey")
                      )        
@@ -180,35 +188,52 @@ class Env:
                       z = full_blocks["Z"],
                       mode = "markers",
                       name = "Filled Space",
-                      marker = dict(size = 10,color = full_blocks['RGB'])
+                      marker = dict(size = 10,color = full_blocks['RGB'], symbol = 'square')
                      )
         layout = go.Layout(dict(title = "State of the Structure",
                         scene = dict(camera = dict(up=dict(x= 0 , y=0, z=0),
                                                    center=dict(x=0, y=0, z=0),
-                                                   eye=dict(x=1.25, y=1.25, z=1.25)),
+                                                   # eye=dict(x=1.25, y=1.25, z=1.25)
+                                                ),
                                      xaxis  = dict(title = "X value",
                                                    gridcolor='rgb(255, 255, 255)',
                                                    zerolinecolor='rgb(255, 255, 255)',
                                                    showbackground=True,
-                                                   backgroundcolor='rgb(230, 230,230)'),
+                                                   backgroundcolor='rgb(230, 230,230)'
+                                                ),
                                      yaxis  = dict(title = "Y value",
                                                    gridcolor='rgb(255, 255, 255)',
                                                    zerolinecolor='rgb(255, 255, 255)',
                                                    showbackground=True,
                                                    backgroundcolor='rgb(230, 230,230)'
-                                                  ),
+                                                ),
                                      zaxis  = dict(title = "Z value",
                                                    gridcolor='rgb(255, 255, 255)',
                                                    zerolinecolor='rgb(255, 255, 255)',
                                                    showbackground=True,
                                                    backgroundcolor='rgb(230, 230,230)'
-                                                  )
+                                                )
                                     ),
-                        height = 700,
+                        height = 1000,
                        )
-                  )
+        )
+        
+        trace3 = go.Scatter3d(
+            x=[drone.pos[0]] * 2,
+            y=[drone.pos[1]] * 2, 
+            z=[0, self.getSize()],
+            name = "Z-location of the drone",
+            marker=dict(
+            size=12,
+            colorscale='Viridis',
+            symbol = 'cross'
+            ),
+        line=dict(
+            color='Black',
+            width=2
+        ))
                   
 
-        data = [trace1,trace2]
-        fig  = go.Figure(data = data,layout = layout)
+        data = [trace1,trace2,trace3]
+        fig  = go.Figure(data = data, layout = layout)
         py.plot(fig)
