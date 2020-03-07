@@ -3,6 +3,7 @@ False
 True
 False
 5
+
 Can't place block beneath another block 0 0 0 2
 None
 warning, you are placing a floating block
@@ -12,4 +13,9 @@ True
 True
 warning, you are placing a floating block
 True
+
+red
+red
+can't take block, there isn't a block to take
+None
 done

@@ -78,7 +78,6 @@ class Env:
         return self.s
 
     def addBlock(self, x, y, tuple):
-        # wip
         color = tuple[0]
         z = tuple[1]
 
@@ -108,20 +107,28 @@ class Env:
         self.state[x][y][z] = color
         return True # success
 
-
-
-
-
-
     def takeBlock(self, x, y):
-        # return none if we can't take...
-        #wip
-        for z in reversed(range(self.s)):
-            if self.state[x][y][z] != "":
-                color = self.state[x][y][z]
-                self.state[x][y][z] = ""
-                return color, z
-        return "", 0
+        bAt = self.blockAt(x,y)
+
+        # check that there is a block there
+        if bAt is None:
+            print("can't take block, there isn't a block to take")
+            return None
+
+        color = bAt[0]
+        z = bAt[1]
+
+        # check that one of the sides is empty
+        leftN = False if x == 0 else self.state[x - 1][y][z] != ""
+        rightN = False if x == self.s - 1 else self.state[x + 1][y][z] != ""
+        upN = False if y == self.s - 1 else self.state[x][y + 1][z] != ""
+        downN = False if y == 0 else self.state[x][y - 1][z] != ""
+        if leftN and rightN and upN and downN:
+            print("can't take block, all of its neighbors are full")
+            return None
+
+        self.state[x][y][z] = ""
+        return color#, z
     
     def convert_to_dataframe(self, State):
         df = pd.DataFrame(columns=['X', 'Y', 'Z', 'RGB'])
@@ -133,7 +140,7 @@ class Env:
                     else:
                         RGB_values = State[x][y][z].split('_')
                         df = df.append({'X': x, 'Y': y, 'Z': z, 'RGB': 'rgb({0},{1},{2})'.format(RGB_values[0],RGB_values[1],RGB_values[2])}, ignore_index=True)
-        print(df.head)
+        #print(df.head)
         return df
 
     def plot_state(self):
