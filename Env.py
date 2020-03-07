@@ -3,7 +3,7 @@ from asyncore import file_dispatcher
 import pandas as pd
 
 import plotly.offline as py #visualization
-
+from plotly.subplots import make_subplots
 import plotly.graph_objs as go#visualization
 
 
@@ -176,6 +176,7 @@ class Env:
         full_blocks     = State[State['RGB'] != '']
 
 
+        fig = make_subplots(rows=1, cols=2)
         trace1 = go.Scatter3d(x = empty_blocks["X"],
                       y = empty_blocks["Y"],
                       z = empty_blocks["Z"],

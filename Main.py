@@ -1,7 +1,7 @@
 import Env
 from drone import Drone 
 
-env = Env.Env("hard.txt")
+env = Env.Env("easy.txt")
 
 print(env.blockAt(0,0))
 
