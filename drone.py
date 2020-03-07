@@ -123,7 +123,7 @@ class Drone:
     #Scans the block below the drone
     def scan(self):
         block = self.env.blockAt(self.pos[0], self.pos[1])
-        if block in None:
+        if block is None:
             block = ["", -1]
         for z in range(self.env.getSize() - 1, block[1], -1):
             self.memory[self.pos[0]][self.pos[1]][block[z]] = None
