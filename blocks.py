@@ -70,37 +70,38 @@ class Algorithm:
         return orderedStack
                                 
     def empty_hopper(self):
-        colours = self.drone.getHopperColours()
-        for c in colours:
-            colourDropped = False
-            for s in self.stacks:
-                if (self.grid.blockAt(s['x'], s['y'])[0] == c):
-                    self.drone.moveTo([s['x'], s['y']])
+        while len(self.drone.hopper) > 0:
+            colours = self.drone.getHopperColours()
+            for c in colours:
+                colourDropped = False
+                for s in self.stacks:
+                    if (self.grid.blockAt(s['x'], s['y'])[0] == c):
+                        self.drone.moveTo([s['x'], s['y']])
+                        self.drone.scan()
+                        full = self.drone.dropOff(c, -1)
+                        if (full == 10):
+                            self.fullStacks.append(s)
+                            self.stacks.remove(s)
+                            if (len(self.emptySpaces) > 0):
+                                newStack = self.emptySpaces[0]
+                            else:
+                                newStack = self.correct[0]
+                            temp = {'x': newStack['x'], 'y': newStack['y'], 'z': newStack['z']}
+                            self.stacks.append(temp)
+                            self.drone.moveTo([temp['x'], temp['y']])
+                            self.drone.dropOff(c, -1)
+                        self.drone.scan()
+                        colourDropped = True
+                        break
+                if (colourDropped == False and len(self.emptySpaces) > 0):
+                    newStack = self.emptySpaces[0]
+                    self.emptySpaces.remove(newStack)
+                    self.stacks.append(newStack)
+                    self.colourStacks.append(c)
+                    self.drone.moveTo([newStack['x'], newStack['y']])
                     self.drone.scan()
-                    full = self.drone.dropOff(c, -1)
-                    if (full == 10):
-                        self.fullStacks.append(s)
-                        self.stacks.remove(s)
-                        if (len(self.emptySpaces) > 0):
-                            newStack = self.emptySpaces[0]
-                        else:
-                            newStack = self.correct[0]
-                        temp = {'x': newStack['x'], 'y': newStack['y'], 'z': newStack['z']}
-                        self.stacks.append(temp)
-                        self.drone.moveTo([temp['x'], temp['y']])
-                        self.drone.dropOff(c, -1)
+                    self.drone.dropOff(c, -1)
                     self.drone.scan()
-                    colourDropped = True
-                    break
-            if (colourDropped == False and len(self.emptySpaces) > 0):
-                newStack = self.emptySpaces[0]
-                self.emptySpaces.remove(newStack)
-                self.stacks.append(newStack)
-                self.colourStacks.append(c)
-                self.drone.moveTo([newStack['x'], newStack['y']])
-                self.drone.scan()
-                self.drone.dropOff(c, -1)
-                self.drone.scan()
 
     def build_stacks(self):
         self.first_sweep()
@@ -140,30 +141,87 @@ class Algorithm:
                             break
                     self.toStack.remove(i)
                     
+    def isAboveComplete(self, i, j, z):
+        for a in self.correct:
+            if (a['x'] == i and a['y'] == j):
+                return z > a['z']
+        return True
+    
+    def nextSpace(self, i, j):
+#        if (j > 0):
+#            return [i, j-1]
+#        else:
+#            return [i-1, self.grid.getSize()-1]
+        if (j < self.grid.getSize() - 1):
+            return [i, j+1]
+        else:
+            return [i+1, 0]
     
     def build_final(self):
-        for z in range(self.grid.getSize()):
-            level_blocks = self.grid.getDesiredLevel(z)
-            for b in level_blocks:
-                if (self.drone.memory[b[0]][b[1]] == None):
-                    if (b[2] in self.hopper):
-                        self.drone.moveTo([b[0], b[1]])
-                        self.drone.dropOff(b[2], z)
-                    else:
-                        for s in self.stacks:
-                            if (self.grid.blockAt(s['x'], s['y'])[0] == b[2]):
-                                self.drone.moveTo([s['x'], s['y']])
-                                self.drone.pickUp()
-                                self.drone.moveTo(b[0], b[1])
-                                self.drone.dropOff(b[2], z)
-                                break
-                        for s in self.full_stacks:
-                            if (self.grid.blockAt(s['x'], s['y'])[0] == b[2]):
-                                self.drone.moveTo([s['x'], s['y']])
-                                self.drone.pickUp()
-                                self.drone.moveTo(b[0], b[1])
-                                self.drone.dropOff(b[2], z)
-                                break
+        self.empty_hopper()
+        self.correct = []
+        for i in range(self.grid.getSize()):
+            for j in range(self.grid.getSize()):
+                column = self.grid.getDesiredColumn(i, j)
+                movedNonBlock = False
+                for h in range(len(column)):
+                    if (movedNonBlock == True):
+                        h -= 1
+                        movedNonBlock = False
+                    if (column[h] == ''):
+                        break
+                    if (column[h] != self.grid.blockAt(i, j)[0]):
+                        if (self.grid.blockAt(i, j)[0] == ''):
+                            for s in (self.stacks + self.fullStacks):
+                                if (s['x'] == 1 and s['y'] == 0):
+                                    pass
+                                if (self.isAboveComplete(s['x'], s['y'], self.grid.blockAt(s['x'], s['y'])[1])):
+                                    if (self.grid.blockAt(s['x'], s['y'])[0] == column[h]):
+                                        self.drone.moveTo([s['x'], s['y']])
+                                        self.drone.pickUp()
+                                        self.drone.moveTo([i, j])
+                                        self.drone.dropOff(column[h], h)
+                                        break
+                        else:
+                            drone_pos = [i, j]
+                            self.drone.moveTo(drone_pos)
+                            self.drone.pickUp()
+                            drone_pos = self.nextSpace(drone_pos[0], drone_pos[1])
+                            while self.grid.blockAt(drone_pos[0], drone_pos[1])[1] >= self.grid.getSize()-1:
+                                drone_pos = self.nextSpace(drone_pos[0], drone_pos[1])
+                            self.drone.moveTo(drone_pos)
+                            self.drone.dropOff(self.grid.blockAt(i, j)[0], -1)
+                            movedNonBlock = True
+                                
+                self.correct.append({'x': i, 'y': j, 'z': self.grid.blockAt(i, j)[1]})
+                            
+        
+#        for z in range(self.grid.getSize()):
+#            level_blocks = self.grid.getDesiredLevel(z)
+#            print(level_blocks)
+#            for b in level_blocks:
+#                if (self.drone.memory[b[0]][b[1]][z] == None or self.drone.memory[b[0]][b[1]][z] == ''):
+#                    if (b[2] in self.drone.hopper):
+#                        self.drone.moveTo([b[0], b[1]])
+#                        self.drone.dropOff(b[2], z)
+#                    else:
+#                        for s in self.stacks:
+#                            if (self.grid.blockAt(s['x'], s['y'])[0] == b[2]):
+#                                self.drone.moveTo([s['x'], s['y']])
+#                                self.drone.pickUp()
+#                                try:
+#                                    self.drone.moveTo([b[0], b[1]])
+#                                except:
+#                                    pass
+#                                self.drone.dropOff(b[2], z)
+#                                break
+#                        for s in self.fullStacks:
+#                            if (self.grid.blockAt(s['x'], s['y'])[0] == b[2]):
+#                                self.drone.moveTo([s['x'], s['y']])
+#                                self.drone.pickUp()
+#                                self.drone.moveTo([b[0], b[1]])
+#                                self.drone.dropOff(b[2], z)
+#                                break
                             
                     
         
