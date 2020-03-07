@@ -87,9 +87,6 @@ class Env:
                     out.append((i, j, temp))
         return out
 
-    def getDesiredColumn(self, x, y):
-        return self.dState[x][y]
-
     def addBlock(self, x, y, tuple):
         color = tuple[0]
         z = tuple[1]

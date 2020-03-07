@@ -115,18 +115,18 @@ class Drone:
             self.time += 3
 
         self.lastColour = colour
-        self.memory[self.pos[0]][self.pos[1]][newZ] = toRemove
+        self.memory[self.pos[0]][self.pos[1]][newZ] = toRemove[0]
         self.scan()
         self.hopper.remove(toRemove) #Remove block from hopper
         return True
-
+    
     #Scans the block below the drone
     def scan(self):
         block = self.env.blockAt(self.pos[0], self.pos[1])
-        if block is None:
+        if block in None:
             block = ["", -1]
         for z in range(self.env.getSize() - 1, block[1], -1):
-            self.memory[self.pos[0]][self.pos[1]][z] = None
+            self.memory[self.pos[0]][self.pos[1]][block[z]] = None
         if block is not None:
             self.memory[self.pos[0]][self.pos[1]][block[1]] = block[0]
         return block

@@ -20,6 +20,6 @@ print_a()
 for i in range(1, a.grid.getSize()):
     a.build_z_stack(i)
 #    print_a()
-a.empty_hopper()
 print_a()
 a.build_final()
+print_a()
