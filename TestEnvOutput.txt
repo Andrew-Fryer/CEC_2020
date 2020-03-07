@@ -1,0 +1,15 @@
+('255_165_0', 2)
+False
+True
+False
+5
+Can't place block beneath another block 0 0 0 2
+None
+warning, you are placing a floating block
+No neightbors to support
+None
+True
+True
+warning, you are placing a floating block
+True
+done
