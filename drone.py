@@ -36,17 +36,26 @@ class Drone:
         
     #Moves the drone in a given direction, updates the time taken
     def move(self, direction): #0 is up, 1 is right, 2 is down, 3 is left
-        self.time += 1
         if (direction == 0):
+            if self.pos[1] >= self.env.s - 1:
+                return None
             self.pos[1] += 1
         elif (direction == 1):
+            if self.pos[0] >= self.env.s - 1:
+                return None
             self.pos[0] += 1
         elif (direction == 2):
+            if self.pos[1] <= 0:
+                return None
             self.pos[1] += -1
         elif (direction == 3):
+            if self.pos[0] <= 0:
+                return None
             self.pos[0] += -1
         else:
-            self.time += -1
+            print("invalid direction")
+        self.time += 1
+        return True
             
     def moveTo(self, target):
         while (self.pos[0] != target[0] and self.pos[1] != target[1]):
